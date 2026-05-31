@@ -1,0 +1,42 @@
+<div class="book-card">
+    <a href="{% url 'book_detail' book.pk %}" class="text-decoration-none">
+        <div class="book-cover-wrap">
+            {% if book.cover_image %}
+            <img src="{{ book.cover_image.url }}" alt="{{ book.title }}">
+            {% else %}
+            <div class="book-cover-placeholder">
+                <span style="font-size:2.5rem;">📚</span>
+                <div class="ph-title">{{ book.title|truncatechars:40 }}</div>
+                <div class="ph-author">{{ book.author }}</div>
+            </div>
+            {% endif %}
+            {% if book.is_bestseller %}<span class="badge-bestseller">🏆 Bestseller</span>{% elif book.is_new_arrival %}<span class="badge-new">✨ New</span>{% endif %}
+            {% if book.book_type == 'audiobook' %}<span class="badge-audio">🎧</span>{% endif %}
+            {% if book.discount_percent > 0 %}<span style="position:absolute;bottom:10px;right:10px;background:var(--rust);color:#fff;font-size:0.65rem;font-weight:700;padding:3px 8px;border-radius:3px;">-{{ book.discount_percent }}%</span>{% endif %}
+        </div>
+    </a>
+    <div class="book-card-body">
+        <div class="book-category">{{ book.category.name }}</div>
+        <a href="{% url 'book_detail' book.pk %}" class="text-decoration-none">
+            <div class="book-title">{{ book.title|truncatechars:50 }}</div>
+        </a>
+        <div class="book-author">{{ book.author }}</div>
+        {% if book.rating > 0 %}
+        <div class="book-rating">
+            {% for i in book.star_range %}
+                {% if i <= book.rating %}<i class="fa fa-star"></i>{% else %}<i class="fa fa-star empty"></i>{% endif %}
+            {% endfor %}
+            <span class="count">({{ book.review_count }})</span>
+        </div>
+        {% endif %}
+        <div class="book-price">
+            {% if book.original_price %}<span class="original">₹{{ book.original_price }}</span>{% endif %}
+            ₹{{ book.price }}
+            {% if book.discount_percent > 0 %}<span class="discount">{{ book.discount_percent }}% off</span>{% endif %}
+        </div>
+        <div class="book-actions">
+            <a href="{% url 'add_to_cart' book.pk %}" class="btn btn-amber btn-sm"><i class="fa fa-cart-plus me-1"></i>Add to Cart</a>
+            <a href="{% url 'book_detail' book.pk %}" class="btn btn-outline-amber btn-sm"><i class="fa fa-eye"></i></a>
+        </div>
+    </div>
+</div>

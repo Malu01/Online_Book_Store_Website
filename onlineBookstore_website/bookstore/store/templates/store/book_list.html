@@ -1,0 +1,49 @@
+{% extends 'store/base.html' %}
+{% block title %}{{ page_title|default:"All Books" }} — BookVerse{% endblock %}
+{% block content %}
+<div class="page-hero">
+    <div class="container">
+        <h1>{{ page_title|default:"📚 All Books" }}</h1>
+        <p style="color:rgba(255,255,255,0.6);margin-bottom:0;">{{ total_books }} books available</p>
+    </div>
+</div>
+<div class="container pb-5">
+    {% if not page_title %}
+    <div class="row g-3 mb-4">
+        <div class="col-md-8">
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{% url 'book_list' %}" class="btn btn-sm {% if not current_category %}btn-amber{% else %}btn-outline-amber{% endif %}">All</a>
+                {% for cat in categories %}
+                <a href="{% url 'book_list' %}?category={{ cat.slug }}{% if current_sort %}&sort={{ current_sort }}{% endif %}" 
+                   class="btn btn-sm {% if current_category == cat.slug %}btn-amber{% else %}btn-outline-amber{% endif %}">{{ cat.icon }} {{ cat.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select onchange="window.location='{% url 'book_list' %}?sort='+this.value+'{% if current_category %}&category={{ current_category }}{% endif %}'" 
+                    class="form-select form-select-sm" style="border-color:var(--amber);">
+                <option value="newest" {% if current_sort == 'newest' %}selected{% endif %}>Newest First</option>
+                <option value="price_low" {% if current_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                <option value="price_high" {% if current_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                <option value="rating" {% if current_sort == 'rating' %}selected{% endif %}>Top Rated</option>
+                <option value="title" {% if current_sort == 'title' %}selected{% endif %}>Title A-Z</option>
+            </select>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if books %}
+    <div class="row g-3">
+        {% for book in books %}
+        <div class="col-6 col-md-4 col-lg-3">{% include 'store/partials/book_card.html' %}</div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div style="font-size:4rem;margin-bottom:16px;">📭</div>
+        <h3 style="font-family:'Playfair Display',serif;">No books found</h3>
+        <p class="text-muted">Try a different filter or <a href="/admin/store/book/add/">add books via admin</a></p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

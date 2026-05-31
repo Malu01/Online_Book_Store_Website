@@ -1,0 +1,195 @@
+{% extends 'store/base.html' %}
+{% load static %}
+
+{% block title %}BookVerse — Your Literary Universe{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section style="background:var(--ink);min-height:88vh;display:flex;align-items:center;position:relative;overflow:hidden;">
+    <div style="position:absolute;inset:0;background:url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><rect fill=\"none\" stroke=\"rgba(200,144,42,0.06)\" stroke-width=\"0.5\" x=\"10\" y=\"10\" width=\"80\" height=\"80\"/><rect fill=\"none\" stroke=\"rgba(200,144,42,0.04)\" stroke-width=\"0.3\" x=\"5\" y=\"5\" width=\"90\" height=\"90\"/></svg>');opacity:0.5;"></div>
+    <div style="position:absolute;right:-100px;top:-100px;width:600px;height:600px;background:radial-gradient(circle,rgba(200,144,42,0.12) 0%,transparent 70%);border-radius:50%;"></div>
+    <div class="container" style="position:relative;z-index:2;">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div style="animation:fadeInUp 0.7s ease;">
+                    <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:3px;color:var(--amber);font-weight:600;margin-bottom:16px;">✦ Welcome to BookVerse</div>
+                    <h1 style="font-family:'Playfair Display',serif;font-size:clamp(2.8rem,5vw,4.2rem);font-weight:900;color:#fff;line-height:1.05;margin-bottom:24px;">
+                        Every Story<br><em style="color:var(--amber-light);">Deserves</em><br>to Be Told
+                    </h1>
+                    <p style="color:rgba(255,255,255,0.65);font-size:1.05rem;line-height:1.75;max-width:440px;margin-bottom:36px;">Explore thousands of titles across every genre. From timeless classics to cutting-edge bestsellers — your next great read is waiting.</p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="{% url 'book_list' %}" class="btn btn-amber px-4 py-3" style="font-size:0.9rem;">Browse All Books <i class="fa fa-arrow-right ms-2"></i></a>
+                        <a href="{% url 'bestsellers' %}" class="btn btn-outline-amber px-4 py-3" style="font-size:0.9rem;color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.25);">🏆 Bestsellers</a>
+                    </div>
+                    <div class="d-flex gap-5 mt-5">
+                        <div><div style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:var(--amber-light);">10K+</div><div style="font-size:0.78rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;">Books</div></div>
+                        <div><div style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:var(--amber-light);">50+</div><div style="font-size:0.78rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;">Categories</div></div>
+                        <div><div style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:var(--amber-light);">25K+</div><div style="font-size:0.78rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;">Readers</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;transform:perspective(1000px) rotateY(-8deg);animation:fadeInUp 0.9s ease 0.2s both;">
+                    {% for book in featured %}
+                    <div style="border-radius:8px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.4);transform:{% if forloop.counter == 2 %}translateY(-20px){% else %}translateY(0){% endif %};">
+                        {% if book.cover_image %}
+                        <img src="{{ book.cover_image.url }}" style="width:100%;aspect-ratio:2/3;object-fit:cover;" alt="{{ book.title }}">
+                        {% else %}
+                        <div style="aspect-ratio:2/3;background:linear-gradient(160deg,#2d3a2d,#1a2818);display:flex;align-items:center;justify-content:center;flex-direction:column;padding:16px;text-align:center;">
+                            <div style="font-size:2.5rem;">📚</div>
+                            <div style="font-family:'Playfair Display',serif;font-size:0.8rem;color:rgba(255,255,255,0.8);margin-top:8px;font-weight:700;">{{ book.title|truncatechars:30 }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="py-5" style="background:var(--cream);">
+    <div class="container">
+        <div class="section-header text-center">
+            <div class="section-label">Discover</div>
+            <h2 class="section-title">Browse by Category</h2>
+            <div class="section-divider mx-auto"></div>
+        </div>
+        <div class="row g-3 justify-content-center">
+            {% for cat in categories %}
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'category_books' cat.slug %}" class="text-decoration-none">
+                    <div style="background:#fff;border-radius:12px;padding:22px 14px;text-align:center;box-shadow:var(--card-shadow);transition:all 0.25s;border:2px solid transparent;" 
+                         onmouseover="this.style.borderColor='var(--amber)';this.style.transform='translateY(-4px)'" 
+                         onmouseout="this.style.borderColor='transparent';this.style.transform='translateY(0)'">
+                        <div style="font-size:2rem;margin-bottom:8px;">{{ cat.icon }}</div>
+                        <div style="font-family:'Playfair Display',serif;font-size:0.88rem;font-weight:700;color:var(--ink);">{{ cat.name }}</div>
+                        <div style="font-size:0.72rem;color:#999;margin-top:3px;">{{ cat.books.count }} books</div>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <p class="text-center text-muted">No categories yet. <a href="/admin/">Add via admin →</a></p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- BESTSELLERS -->
+{% if bestsellers %}
+<section class="py-5 container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div class="section-header mb-0">
+            <div class="section-label">Top Picks</div>
+            <h2 class="section-title">🏆 Best Sellers</h2>
+            <div class="section-divider"></div>
+        </div>
+        <a href="{% url 'bestsellers' %}" class="btn btn-outline-amber btn-sm">View All</a>
+    </div>
+    <div class="row g-3">
+        {% for book in bestsellers %}
+        <div class="col-6 col-md-4 col-lg-3 fade-in-up">
+            {% include 'store/partials/book_card.html' %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- PROMO BANNER -->
+<section style="background:linear-gradient(135deg,var(--sage) 0%,var(--sage-light) 100%);padding:56px 0;margin:24px 0;">
+    <div class="container text-center">
+        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:3px;color:rgba(255,255,255,0.7);margin-bottom:12px;">Limited Time</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:900;color:#fff;margin-bottom:12px;">AI-Powered Book Summaries</h2>
+        <p style="color:rgba(255,255,255,0.8);font-size:1rem;max-width:500px;margin:0 auto 28px;">Every book detail page features an instant AI-generated summary powered by Google Gemini — know what you're buying before you buy it.</p>
+        <a href="{% url 'book_list' %}" class="btn px-5 py-3" style="background:#fff;color:var(--sage);font-weight:700;">Explore Books <i class="fa fa-sparkles ms-2"></i></a>
+    </div>
+</section>
+
+<!-- NEW ARRIVALS -->
+{% if new_arrivals %}
+<section class="py-5 container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div class="section-header mb-0">
+            <div class="section-label">Just In</div>
+            <h2 class="section-title">🆕 New Arrivals</h2>
+            <div class="section-divider"></div>
+        </div>
+        <a href="{% url 'new_arrivals' %}" class="btn btn-outline-amber btn-sm">View All</a>
+    </div>
+    <div class="row g-3">
+        {% for book in new_arrivals %}
+        <div class="col-6 col-md-4 col-lg-3 fade-in-up">
+            {% include 'store/partials/book_card.html' %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- AUDIOBOOKS -->
+{% if audiobooks %}
+<section class="py-5" style="background:var(--ink);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div class="section-header mb-0">
+                <div class="section-label" style="color:var(--amber-light);">Listen & Learn</div>
+                <h2 class="section-title" style="color:#fff;">🎧 Audiobooks</h2>
+                <div class="section-divider"></div>
+            </div>
+            <a href="{% url 'audiobooks' %}" class="btn btn-outline-amber btn-sm">View All</a>
+        </div>
+        <div class="row g-3">
+            {% for book in audiobooks %}
+            <div class="col-6 col-md-4 col-lg-3">
+                {% include 'store/partials/book_card.html' %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- NEWSLETTER -->
+<section style="background:var(--amber);padding:80px 0;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.75);margin-bottom:10px;">Stay Updated</div>
+                <h2 style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:900;color:#fff;margin-bottom:12px;">Never Miss a Great Read</h2>
+                <p style="color:rgba(255,255,255,0.85);font-size:0.95rem;">Join 25,000+ book lovers. Get new releases, exclusive deals, and curated reading lists delivered weekly.</p>
+            </div>
+            <div class="col-lg-6">
+                <div id="nl-form" class="d-flex gap-2 flex-wrap">
+                    <input type="text" id="nl-name" placeholder="Your name" class="form-control" style="flex:1;min-width:130px;border:none;background:rgba(255,255,255,0.25);color:#fff;padding:14px 16px;" />
+                    <input type="email" id="nl-email" placeholder="Your email address" class="form-control" style="flex:2;min-width:200px;border:none;background:rgba(255,255,255,0.25);color:#fff;padding:14px 16px;" />
+                    <button onclick="nlSubscribe()" class="btn px-4" style="background:var(--ink);color:var(--amber-light);font-weight:700;border:none;padding:14px 24px;">Subscribe</button>
+                </div>
+                <div id="nl-msg" class="mt-2 text-white" style="font-size:0.85rem;"></div>
+                <p style="color:rgba(255,255,255,0.65);font-size:0.75rem;margin-top:10px;"><i class="fa fa-lock me-1"></i>No spam, ever. Unsubscribe anytime.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function nlSubscribe() {
+    const email = document.getElementById('nl-email').value;
+    const name = document.getElementById('nl-name').value;
+    if (!email) return;
+    fetch('/subscribe/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': getCookie('csrftoken')},
+        body: 'email=' + encodeURIComponent(email) + '&name=' + encodeURIComponent(name)
+    }).then(r => r.json()).then(d => {
+        document.getElementById('nl-msg').textContent = d.message;
+        if (d.status === 'success') { document.getElementById('nl-email').value = ''; document.getElementById('nl-name').value = ''; }
+    });
+}
+</script>
+{% endblock %}

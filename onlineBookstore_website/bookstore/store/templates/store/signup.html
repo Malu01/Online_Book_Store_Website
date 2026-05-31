@@ -1,0 +1,276 @@
+{% extends 'store/base.html' %}
+{% block title %}Create Account — BookVerse{% endblock %}
+
+{% block extra_css %}
+<style>
+.auth-page {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #1a1208 0%, #2d1f0e 50%, #1a2818 100%);
+    padding: 40px 0;
+    position: relative;
+    overflow: hidden;
+}
+.auth-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8902a' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.auth-glow { position:absolute; width:500px; height:500px; border-radius:50%; filter:blur(80px); opacity:0.12; }
+.auth-glow-1 { background:var(--amber); top:-100px; right:-100px; }
+.auth-glow-2 { background:var(--sage); bottom:-100px; left:-150px; }
+
+.auth-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 44px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.35);
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+    animation: fadeInUp 0.5s ease;
+}
+.auth-logo { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:900; color:var(--ink); text-align:center; margin-bottom:6px; }
+.auth-logo span { color:var(--amber); }
+.auth-subtitle { text-align:center; color:#888; font-size:0.88rem; margin-bottom:28px; }
+.auth-label { font-size:0.78rem; font-weight:600; text-transform:uppercase; letter-spacing:0.8px; color:#555; margin-bottom:6px; display:block; }
+.auth-input {
+    width:100%; padding:12px 16px 12px 44px;
+    border:2px solid #e8e0d6; border-radius:8px;
+    font-size:0.9rem; color:var(--ink);
+    background:#faf8f5; transition:all 0.2s;
+    font-family:'DM Sans',sans-serif;
+}
+.auth-input:focus { outline:none; border-color:var(--amber); background:#fff; box-shadow:0 0 0 4px rgba(200,144,42,0.1); }
+.auth-input.valid { border-color:#22c55e; }
+.auth-input.invalid { border-color:#ef4444; }
+.input-wrap { position:relative; margin-bottom:16px; }
+.input-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#bbb; font-size:0.88rem; pointer-events:none; transition:color 0.2s; }
+.input-wrap:focus-within .input-icon { color:var(--amber); }
+.toggle-pw { position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#bbb; cursor:pointer; font-size:0.88rem; transition:color 0.2s; }
+.toggle-pw:hover { color:var(--amber); }
+.field-hint { font-size:0.75rem; margin-top:4px; margin-bottom:0; }
+.field-hint.ok { color:#22c55e; }
+.field-hint.err { color:#ef4444; }
+
+.pw-strength { margin-top:6px; margin-bottom:12px; }
+.pw-strength-bar { height:4px; border-radius:2px; background:#e8e0d6; margin-bottom:4px; overflow:hidden; }
+.pw-strength-fill { height:100%; border-radius:2px; transition:all 0.3s; width:0; }
+.pw-strength-label { font-size:0.72rem; color:#999; }
+
+.btn-auth { width:100%; padding:14px; background:var(--amber); color:#fff; border:none; border-radius:8px; font-size:0.95rem; font-weight:700; font-family:'DM Sans',sans-serif; cursor:pointer; transition:all 0.25s; letter-spacing:0.3px; margin-top:8px; }
+.btn-auth:hover { background:var(--amber-dark); transform:translateY(-2px); box-shadow:0 8px 24px rgba(200,144,42,0.35); }
+.btn-auth:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+.auth-switch { text-align:center; font-size:0.88rem; color:#888; margin-top:20px; }
+.auth-switch a { color:var(--amber); font-weight:600; text-decoration:none; }
+.auth-switch a:hover { text-decoration:underline; }
+
+.terms-check { display:flex; gap:10px; align-items:flex-start; font-size:0.82rem; color:#666; margin-bottom:4px; margin-top:8px; }
+.terms-check input { margin-top:3px; accent-color:var(--amber); flex-shrink:0; }
+.terms-check a { color:var(--amber); text-decoration:none; font-weight:600; }
+
+.alert-auth { border-radius:8px; padding:12px 16px; font-size:0.86rem; margin-bottom:20px; border:none; }
+.alert-auth.error { background:#fef2f2; color:#b91c1c; border-left:3px solid #ef4444; }
+.alert-auth.success { background:#f0fdf4; color:#166534; border-left:3px solid #22c55e; }
+
+.benefit-badge {
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--cream); border-radius:20px;
+    padding:6px 12px; font-size:0.78rem; color:#555; margin:3px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-glow auth-glow-1"></div>
+    <div class="auth-glow auth-glow-2"></div>
+    <div class="container">
+        <div class="auth-card">
+            <div class="auth-logo">📚 Book<span>Verse</span></div>
+            <div class="auth-subtitle">Join 25,000+ book lovers. It's free!</div>
+
+            <div class="text-center mb-4">
+                <span class="benefit-badge">✨ Free account</span>
+                <span class="benefit-badge">🛒 Cart & orders</span>
+                <span class="benefit-badge">🤖 AI summaries</span>
+                <span class="benefit-badge">📧 Newsletter</span>
+            </div>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert-auth {% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                {% if message.tags == 'error' %}⚠️{% else %}✅{% endif %} {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="post" action="{% url 'signup' %}" id="signupForm" novalidate>
+                {% csrf_token %}
+
+                <div class="row g-0" style="gap:12px;display:grid;grid-template-columns:1fr 1fr;">
+                    <div>
+                        <label class="auth-label">First Name</label>
+                        <div class="input-wrap" style="margin-bottom:0;">
+                            <i class="fa fa-user input-icon"></i>
+                            <input type="text" name="first_name" class="auth-input" placeholder="First name" required autocomplete="given-name">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="auth-label">Last Name</label>
+                        <div class="input-wrap" style="margin-bottom:0;">
+                            <i class="fa fa-user input-icon"></i>
+                            <input type="text" name="last_name" class="auth-input" placeholder="Last name" required autocomplete="family-name">
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-bottom:16px;"></div>
+
+                <div>
+                    <label class="auth-label">Username</label>
+                    <div class="input-wrap">
+                        <i class="fa fa-at input-icon"></i>
+                        <input type="text" name="username" id="username" class="auth-input" placeholder="Choose a username" required autocomplete="username" oninput="checkUsername(this)">
+                    </div>
+                    <p class="field-hint" id="username-hint"></p>
+                </div>
+
+                <div>
+                    <label class="auth-label">Email Address</label>
+                    <div class="input-wrap">
+                        <i class="fa fa-envelope input-icon"></i>
+                        <input type="email" name="email" id="email" class="auth-input" placeholder="your@email.com" required autocomplete="email" oninput="checkEmail(this)">
+                    </div>
+                    <p class="field-hint" id="email-hint"></p>
+                </div>
+
+                <div>
+                    <label class="auth-label">Password</label>
+                    <div class="input-wrap" style="margin-bottom:4px;">
+                        <i class="fa fa-lock input-icon"></i>
+                        <input type="password" name="password1" id="pw1" class="auth-input" placeholder="Create a strong password" required autocomplete="new-password" oninput="checkPwStrength(this.value)">
+                        <i class="fa fa-eye toggle-pw" onclick="togglePw('pw1', this)"></i>
+                    </div>
+                    <div class="pw-strength">
+                        <div class="pw-strength-bar"><div class="pw-strength-fill" id="pw-bar"></div></div>
+                        <div class="pw-strength-label" id="pw-label">Enter a password</div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="auth-label">Confirm Password</label>
+                    <div class="input-wrap">
+                        <i class="fa fa-lock input-icon"></i>
+                        <input type="password" name="password2" id="pw2" class="auth-input" placeholder="Repeat your password" required autocomplete="new-password" oninput="checkPwMatch()">
+                        <i class="fa fa-eye toggle-pw" onclick="togglePw('pw2', this)"></i>
+                    </div>
+                    <p class="field-hint" id="pw-match-hint"></p>
+                </div>
+
+                <label class="terms-check">
+                    <input type="checkbox" name="agree_terms" id="agreeTerms" required>
+                    <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I consent to receiving occasional emails from BookVerse.</span>
+                </label>
+
+                <button type="submit" class="btn-auth" id="submitBtn">
+                    <i class="fa fa-user-plus me-2"></i>Create My Account
+                </button>
+            </form>
+
+            <div class="auth-switch">
+                Already have an account? <a href="{% url 'login' %}">Sign in →</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePw(id, icon) {
+    const input = document.getElementById(id);
+    input.type = input.type === 'password' ? 'text' : 'password';
+    icon.classList.toggle('fa-eye');
+    icon.classList.toggle('fa-eye-slash');
+}
+
+function checkUsername(input) {
+    const val = input.value.trim();
+    const hint = document.getElementById('username-hint');
+    if (val.length < 3) {
+        hint.textContent = val.length ? '⚠ At least 3 characters required' : '';
+        hint.className = 'field-hint err';
+        input.classList.remove('valid'); input.classList.add('invalid');
+    } else if (/[^a-zA-Z0-9_]/.test(val)) {
+        hint.textContent = '⚠ Only letters, numbers, and underscores';
+        hint.className = 'field-hint err';
+        input.classList.remove('valid'); input.classList.add('invalid');
+    } else {
+        hint.textContent = '✓ Looks good!';
+        hint.className = 'field-hint ok';
+        input.classList.remove('invalid'); input.classList.add('valid');
+    }
+}
+
+function checkEmail(input) {
+    const val = input.value.trim();
+    const hint = document.getElementById('email-hint');
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+    if (val && !valid) {
+        hint.textContent = '⚠ Enter a valid email address';
+        hint.className = 'field-hint err';
+        input.classList.remove('valid'); input.classList.add('invalid');
+    } else if (valid) {
+        hint.textContent = '✓ Valid email';
+        hint.className = 'field-hint ok';
+        input.classList.remove('invalid'); input.classList.add('valid');
+    } else {
+        hint.textContent = '';
+    }
+}
+
+function checkPwStrength(pw) {
+    const bar = document.getElementById('pw-bar');
+    const label = document.getElementById('pw-label');
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    const levels = [
+        { w: '0%', color: '#e8e0d6', text: 'Enter a password' },
+        { w: '25%', color: '#ef4444', text: '🔴 Weak' },
+        { w: '50%', color: '#f97316', text: '🟠 Fair' },
+        { w: '75%', color: '#eab308', text: '🟡 Good' },
+        { w: '100%', color: '#22c55e', text: '🟢 Strong' },
+    ];
+    const lvl = pw.length === 0 ? levels[0] : levels[Math.max(1, score)];
+    bar.style.width = lvl.w;
+    bar.style.background = lvl.color;
+    label.textContent = lvl.text;
+    checkPwMatch();
+}
+
+function checkPwMatch() {
+    const pw1 = document.getElementById('pw1').value;
+    const pw2 = document.getElementById('pw2').value;
+    const hint = document.getElementById('pw-match-hint');
+    const input2 = document.getElementById('pw2');
+    if (!pw2) { hint.textContent = ''; return; }
+    if (pw1 === pw2) {
+        hint.textContent = '✓ Passwords match';
+        hint.className = 'field-hint ok';
+        input2.classList.remove('invalid'); input2.classList.add('valid');
+    } else {
+        hint.textContent = '⚠ Passwords do not match';
+        hint.className = 'field-hint err';
+        input2.classList.remove('valid'); input2.classList.add('invalid');
+    }
+}
+</script>
+{% endblock %}

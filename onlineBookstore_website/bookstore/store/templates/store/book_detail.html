@@ -1,0 +1,161 @@
+{% extends 'store/base.html' %}
+{% block title %}{{ book.title }} — BookVerse{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb" style="font-size:0.85rem;">
+            <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-amber">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'book_list' %}" class="text-amber">Books</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'category_books' book.category.slug %}" class="text-amber">{{ book.category.name }}</a></li>
+            <li class="breadcrumb-item active">{{ book.title|truncatechars:30 }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5">
+        <!-- COVER -->
+        <div class="col-md-4 col-lg-3">
+            <div style="border-radius:12px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.2);position:sticky;top:80px;">
+                {% if book.cover_image %}
+                <img src="{{ book.cover_image.url }}" class="img-fluid" alt="{{ book.title }}" style="width:100%;aspect-ratio:2/3;object-fit:cover;">
+                {% else %}
+                <div style="aspect-ratio:2/3;background:linear-gradient(160deg,#2d3a2d,#1a2818);display:flex;align-items:center;justify-content:center;flex-direction:column;padding:24px;text-align:center;">
+                    <div style="font-size:4rem;">📚</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:#fff;margin-top:12px;font-weight:700;">{{ book.title }}</div>
+                    <div style="color:rgba(255,255,255,0.6);margin-top:6px;font-style:italic;font-size:0.88rem;">{{ book.author }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% if book.is_bestseller %}<div class="text-center mt-3"><span class="badge bg-warning text-dark px-3 py-2">🏆 Bestseller</span></div>{% endif %}
+            {% if book.is_new_arrival %}<div class="text-center mt-3"><span class="badge bg-success px-3 py-2">✨ New Arrival</span></div>{% endif %}
+        </div>
+
+        <!-- DETAILS -->
+        <div class="col-md-8 col-lg-9">
+            <div class="mb-1" style="font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--amber);font-weight:600;">{{ book.category.icon }} {{ book.category.name }}</div>
+            <h1 style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:900;line-height:1.15;margin-bottom:6px;">{{ book.title }}</h1>
+            <p style="font-size:1.05rem;color:#666;margin-bottom:16px;font-style:italic;">by {{ book.author }}</p>
+
+            {% if book.rating > 0 %}
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="stars" style="font-size:1.1rem;">
+                    {% for i in star_range %}{% if i <= book.rating %}<i class="fa fa-star"></i>{% else %}<i class="fa fa-star empty"></i>{% endif %}{% endfor %}
+                </div>
+                <span style="font-size:0.9rem;color:#666;">{{ book.rating }}/5 · {{ book.review_count }} reviews</span>
+            </div>
+            {% endif %}
+
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <span style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--ink);">₹{{ book.price }}</span>
+                {% if book.original_price %}<span style="text-decoration:line-through;color:#aaa;font-size:1.1rem;">₹{{ book.original_price }}</span>{% endif %}
+                {% if book.discount_percent > 0 %}<span class="badge" style="background:var(--sage);color:#fff;font-size:0.85rem;">{{ book.discount_percent }}% OFF</span>{% endif %}
+            </div>
+
+            {% if book.stock > 0 %}
+            <div class="d-flex gap-3 mb-4 flex-wrap">
+                <a href="{% url 'add_to_cart' book.pk %}" class="btn btn-amber btn-lg px-5"><i class="fa fa-cart-plus me-2"></i>Add to Cart</a>
+                <a href="{% url 'checkout' %}" onclick="event.preventDefault();fetch('{% url 'add_to_cart' book.pk %}').then(()=>window.location='/checkout/');" class="btn btn-sage btn-lg px-5"><i class="fa fa-bolt me-2"></i>Buy Now</a>
+            </div>
+            {% else %}
+            <div class="alert alert-warning mb-4">📦 Currently out of stock</div>
+            {% endif %}
+
+            <div class="row g-3 mb-4">
+                <div class="col-auto"><div style="background:var(--cream);border-radius:8px;padding:10px 16px;font-size:0.82rem;"><strong>📖 Type:</strong> {{ book.get_book_type_display }}</div></div>
+                {% if book.pages %}<div class="col-auto"><div style="background:var(--cream);border-radius:8px;padding:10px 16px;font-size:0.82rem;"><strong>📄 Pages:</strong> {{ book.pages }}</div></div>{% endif %}
+                {% if book.language %}<div class="col-auto"><div style="background:var(--cream);border-radius:8px;padding:10px 16px;font-size:0.82rem;"><strong>🌐 Language:</strong> {{ book.language }}</div></div>{% endif %}
+                {% if book.publisher %}<div class="col-auto"><div style="background:var(--cream);border-radius:8px;padding:10px 16px;font-size:0.82rem;"><strong>🏢 Publisher:</strong> {{ book.publisher }}</div></div>{% endif %}
+                {% if book.isbn %}<div class="col-auto"><div style="background:var(--cream);border-radius:8px;padding:10px 16px;font-size:0.82rem;"><strong>ISBN:</strong> {{ book.isbn }}</div></div>{% endif %}
+            </div>
+
+            <!-- DESCRIPTION -->
+            <div class="mb-4">
+                <h4 style="font-family:'Playfair Display',serif;margin-bottom:12px;">About this Book</h4>
+                <p style="line-height:1.8;color:#444;">{{ book.description }}</p>
+            </div>
+
+            <!-- AI SUMMARY -->
+            <div style="background:linear-gradient(135deg,#f0f4ff,#e8f5f0);border-radius:12px;padding:24px;border-left:4px solid var(--sage);margin-bottom:24px;">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 style="font-family:'Playfair Display',serif;margin:0;"><span style="background:var(--sage);color:#fff;padding:3px 10px;border-radius:4px;font-size:0.78rem;font-weight:600;margin-right:8px;">✨ AI</span>Gemini Summary</h5>
+                    <button onclick="fetchAISummary({{ book.pk }})" id="ai-btn" class="btn btn-sm btn-sage">Generate Summary</button>
+                </div>
+                <div id="ai-summary" style="color:#444;font-size:0.92rem;line-height:1.75;">
+                    {% if book.ai_summary %}{{ book.ai_summary }}{% else %}<em style="color:#999;">Click "Generate Summary" to get an AI-powered overview of this book using Google Gemini.</em>{% endif %}
+                </div>
+                <div id="ai-loader" class="d-none text-center py-2"><div class="spinner-border spinner-border-sm text-success" role="status"></div> <span style="font-size:0.85rem;color:#666;">Generating with Gemini AI...</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div class="row mt-5 g-5">
+        <div class="col-lg-6">
+            <h3 style="font-family:'Playfair Display',serif;margin-bottom:24px;">Reader Reviews</h3>
+            {% for review in reviews %}
+            <div style="background:#fff;border-radius:10px;padding:20px;margin-bottom:16px;box-shadow:var(--card-shadow);">
+                <div class="d-flex justify-content-between mb-2">
+                    <strong>{{ review.reviewer_name }}</strong>
+                    <div class="stars" style="font-size:0.85rem;">{% for i in star_range %}{% if i <= review.rating %}<i class="fa fa-star"></i>{% else %}<i class="fa fa-star empty"></i>{% endif %}{% endfor %}</div>
+                </div>
+                <p style="color:#555;font-size:0.9rem;margin:0;">{{ review.comment }}</p>
+                <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+            </div>
+            {% empty %}
+            <p class="text-muted">No reviews yet. Be the first to review!</p>
+            {% endfor %}
+        </div>
+        <div class="col-lg-6">
+            <h3 style="font-family:'Playfair Display',serif;margin-bottom:24px;">Write a Review</h3>
+            <form method="post" style="background:#fff;border-radius:10px;padding:24px;box-shadow:var(--card-shadow);">
+                {% csrf_token %}
+                <div class="mb-3"><input type="text" name="reviewer_name" class="form-control" placeholder="Your name" required></div>
+                <div class="mb-3"><input type="email" name="reviewer_email" class="form-control" placeholder="Your email" required></div>
+                <div class="mb-3">
+                    <label class="form-label fw-600">Rating</label>
+                    <div class="d-flex gap-2">
+                        {% for i in star_range %}
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="rating" value="{{ i }}" id="r{{ i }}" required>
+                            <label class="form-check-label" for="r{{ i }}" style="color:var(--amber);">{{ i }}★</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="mb-3"><textarea name="comment" class="form-control" rows="4" placeholder="Share your thoughts..." required></textarea></div>
+                <button type="submit" class="btn btn-amber w-100">Submit Review</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- RELATED -->
+    {% if related_books %}
+    <div class="mt-5">
+        <h3 style="font-family:'Playfair Display',serif;margin-bottom:24px;">You Might Also Like</h3>
+        <div class="row g-3">
+            {% for book in related_books %}
+            <div class="col-6 col-md-3">{% include 'store/partials/book_card.html' %}</div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function fetchAISummary(bookId) {
+    document.getElementById('ai-btn').disabled = true;
+    document.getElementById('ai-loader').classList.remove('d-none');
+    document.getElementById('ai-summary').style.opacity = '0.4';
+    fetch('/books/' + bookId + '/ai-summary/')
+        .then(r => r.json())
+        .then(d => {
+            document.getElementById('ai-summary').textContent = d.summary || d.error;
+            document.getElementById('ai-summary').style.opacity = '1';
+            document.getElementById('ai-loader').classList.add('d-none');
+            document.getElementById('ai-btn').textContent = '🔄 Regenerate';
+            document.getElementById('ai-btn').disabled = false;
+        });
+}
+</script>
+{% endblock %}

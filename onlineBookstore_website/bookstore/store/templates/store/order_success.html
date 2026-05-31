@@ -1,0 +1,29 @@
+{% extends 'store/base.html' %}
+{% block title %}Order Placed! — BookVerse{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="text-center py-5">
+        <div style="font-size:5rem;animation:fadeInUp 0.5s ease;">✅</div>
+        <h1 style="font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:900;margin:20px 0 10px;">Order Confirmed!</h1>
+        <p style="font-size:1.1rem;color:#666;max-width:500px;margin:0 auto 30px;">Thank you for your order, <strong>{{ order.full_name }}</strong>! We've received it and will process it shortly.</p>
+        <div style="background:#fff;border-radius:16px;padding:32px;max-width:500px;margin:0 auto;box-shadow:var(--card-shadow);">
+            <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;color:var(--amber);margin-bottom:8px;">Order Number</div>
+            <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--ink);">#{{ order.order_number }}</div>
+            <hr class="my-3">
+            <div class="row g-3 text-start">
+                <div class="col-6"><div style="font-size:0.78rem;color:#999;">Email</div><div style="font-weight:600;font-size:0.9rem;">{{ order.email }}</div></div>
+                <div class="col-6"><div style="font-size:0.78rem;color:#999;">Total</div><div style="font-weight:700;font-size:1.1rem;color:var(--amber-dark);">₹{{ order.total_amount }}</div></div>
+                <div class="col-6"><div style="font-size:0.78rem;color:#999;">Payment</div><div style="font-weight:600;font-size:0.9rem;">{{ order.payment_method }}</div></div>
+                <div class="col-6"><div style="font-size:0.78rem;color:#999;">Status</div><span class="badge bg-success">{{ order.get_status_display }}</span></div>
+            </div>
+            <div class="mt-3 p-3" style="background:var(--cream);border-radius:8px;font-size:0.82rem;color:#666;text-align:left;">
+                📦 Estimated delivery: <strong>3-7 business days</strong> to {{ order.city }}, {{ order.state }}
+            </div>
+        </div>
+        <div class="mt-5 d-flex gap-3 justify-content-center flex-wrap">
+            <a href="{% url 'home' %}" class="btn btn-amber px-5 py-3">Continue Shopping</a>
+            <a href="{% url 'book_list' %}" class="btn btn-outline-amber px-5 py-3">Browse More Books</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

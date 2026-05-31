@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BookVerse — Your Literary Universe{% endblock %}</title>
+    {% load static %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #1a1208;
+            --parchment: #faf6f0;
+            --cream: #f5ede0;
+            --amber: #c8902a;
+            --amber-light: #e8b84b;
+            --amber-dark: #9a6b18;
+            --sage: #3d5a4c;
+            --sage-light: #5a7a68;
+            --rust: #b5451b;
+            --card-shadow: 0 4px 20px rgba(26,18,8,0.12);
+            --card-hover: 0 12px 40px rgba(26,18,8,0.22);
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--parchment);
+            color: var(--ink);
+            min-height: 100vh;
+        }
+        h1,h2,h3,h4 { font-family: 'Playfair Display', serif; }
+
+        /* NAVBAR */
+        .navbar {
+            background: var(--ink) !important;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: var(--amber-light) !important;
+            letter-spacing: -0.5px;
+            padding: 12px 0;
+        }
+        .navbar-brand span { color: #fff; }
+        .nav-link {
+            color: rgba(255,255,255,0.82) !important;
+            font-weight: 500;
+            font-size: 0.88rem;
+            letter-spacing: 0.4px;
+            padding: 22px 14px !important;
+            transition: color 0.2s;
+            text-transform: uppercase;
+        }
+        .nav-link:hover, .nav-link.active { color: var(--amber-light) !important; }
+        .nav-link .fa { margin-right: 4px; font-size: 0.8rem; }
+        .navbar-search input {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            border-radius: 4px 0 0 4px;
+            padding: 7px 14px;
+            font-size: 0.85rem;
+            width: 220px;
+        }
+        .navbar-search input::placeholder { color: rgba(255,255,255,0.5); }
+        .navbar-search input:focus { outline: none; border-color: var(--amber); background: rgba(255,255,255,0.15); }
+        .navbar-search button {
+            background: var(--amber);
+            border: none;
+            color: #fff;
+            padding: 7px 14px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .navbar-search button:hover { background: var(--amber-dark); }
+        .cart-badge {
+            background: var(--rust);
+            color: #fff;
+            border-radius: 50%;
+            width: 18px; height: 18px;
+            font-size: 0.65rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 10px; right: 4px;
+            font-weight: 700;
+        }
+
+        /* BUTTONS */
+        .btn-amber {
+            background: var(--amber);
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+        .btn-amber:hover { background: var(--amber-dark); color: #fff; transform: translateY(-1px); box-shadow: 0 4px 15px rgba(200,144,42,0.4); }
+        .btn-sage {
+            background: var(--sage);
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+        .btn-sage:hover { background: var(--sage-light); color: #fff; transform: translateY(-1px); }
+        .btn-outline-amber {
+            border: 2px solid var(--amber);
+            color: var(--amber);
+            background: transparent;
+            font-weight: 600;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+        .btn-outline-amber:hover { background: var(--amber); color: #fff; }
+
+        /* BOOK CARD */
+        .book-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: 1px solid rgba(200,144,42,0.08);
+        }
+        .book-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--card-hover);
+        }
+        .book-cover-wrap {
+            position: relative;
+            padding-top: 140%;
+            overflow: hidden;
+            background: linear-gradient(135deg, #2d1f0e, #4a3520);
+        }
+        .book-cover-wrap img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .book-card:hover .book-cover-wrap img { transform: scale(1.05); }
+        .book-cover-placeholder {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.7);
+            font-family: 'Playfair Display', serif;
+            padding: 16px;
+            text-align: center;
+            background: linear-gradient(160deg, #2d3a2d 0%, #1a2818 100%);
+        }
+        .book-cover-placeholder .ph-title { font-size: 0.95rem; font-weight: 700; line-height: 1.3; margin-top: 8px; }
+        .book-cover-placeholder .ph-author { font-size: 0.72rem; opacity: 0.7; font-style: italic; margin-top: 4px; }
+        .badge-bestseller {
+            position: absolute; top: 10px; left: 10px;
+            background: var(--amber); color: #fff;
+            font-size: 0.65rem; font-weight: 700;
+            padding: 3px 8px; border-radius: 3px;
+            letter-spacing: 0.5px; text-transform: uppercase;
+        }
+        .badge-new {
+            position: absolute; top: 10px; left: 10px;
+            background: var(--sage); color: #fff;
+            font-size: 0.65rem; font-weight: 700;
+            padding: 3px 8px; border-radius: 3px;
+            letter-spacing: 0.5px; text-transform: uppercase;
+        }
+        .badge-audio {
+            position: absolute; top: 10px; right: 10px;
+            background: var(--rust); color: #fff;
+            font-size: 0.65rem; font-weight: 700;
+            padding: 3px 8px; border-radius: 3px;
+        }
+        .book-card-body { padding: 14px 16px 16px; }
+        .book-category { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--amber); font-weight: 600; margin-bottom: 4px; }
+        .book-title { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; line-height: 1.3; margin-bottom: 2px; color: var(--ink); }
+        .book-author { font-size: 0.8rem; color: #666; margin-bottom: 8px; font-style: italic; }
+        .book-rating { font-size: 0.78rem; color: var(--amber); margin-bottom: 8px; }
+        .book-rating .count { color: #999; margin-left: 4px; }
+        .book-price { font-size: 1.05rem; font-weight: 700; color: var(--ink); }
+        .book-price .original { font-size: 0.82rem; text-decoration: line-through; color: #aaa; margin-right: 6px; font-weight: 400; }
+        .book-price .discount { font-size: 0.75rem; background: #e8f5e9; color: #2e7d32; padding: 2px 6px; border-radius: 3px; margin-left: 4px; font-weight: 600; }
+        .book-actions { display: flex; gap: 8px; margin-top: 10px; }
+        .book-actions .btn { font-size: 0.8rem; padding: 7px 12px; flex: 1; }
+
+        /* SECTION STYLES */
+        .section-header { margin-bottom: 32px; }
+        .section-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--amber); font-weight: 600; margin-bottom: 6px; }
+        .section-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; color: var(--ink); line-height: 1.1; }
+        .section-divider { width: 50px; height: 3px; background: var(--amber); margin-top: 12px; }
+
+        /* FOOTER */
+        footer {
+            background: var(--ink);
+            color: rgba(255,255,255,0.75);
+            padding: 56px 0 24px;
+            margin-top: 80px;
+        }
+        footer h5 { font-family: 'Playfair Display', serif; color: #fff; font-size: 1.1rem; margin-bottom: 18px; }
+        footer a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.88rem; display: block; margin-bottom: 8px; transition: color 0.2s; }
+        footer a:hover { color: var(--amber-light); }
+        .footer-brand { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 900; color: var(--amber-light); }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); margin-top: 40px; padding-top: 20px; font-size: 0.82rem; }
+
+        /* MESSAGES */
+        .alert { border: none; border-radius: 6px; font-size: 0.88rem; }
+
+        /* STARS */
+        .stars { color: var(--amber); }
+        .stars .empty { color: #ddd; }
+
+        /* MISC */
+        .page-hero {
+            background: var(--ink);
+            color: #fff;
+            padding: 48px 0;
+            margin-bottom: 48px;
+        }
+        .page-hero h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 900; }
+        .text-amber { color: var(--amber) !important; }
+        .bg-cream { background: var(--cream); }
+
+        /* ANIMATIONS */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up { animation: fadeInUp 0.5s ease forwards; }
+        .fade-in-up:nth-child(2) { animation-delay: 0.1s; }
+        .fade-in-up:nth-child(3) { animation-delay: 0.2s; }
+        .fade-in-up:nth-child(4) { animation-delay: 0.3s; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .navbar-search { display: none; }
+            .section-title { font-size: 1.6rem; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">📚 Book<span>Verse</span></a>
+        <button class="navbar-toggler border-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"><i class="fa fa-home"></i>Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'book_list' %}"><i class="fa fa-book-open"></i>All Books</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'bestsellers' %}"><i class="fa fa-trophy"></i>Bestsellers</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'new_arrivals' %}"><i class="fa fa-star"></i>New Arrivals</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'audiobooks' %}"><i class="fa fa-headphones"></i>Audiobooks</a></li>
+            </ul>
+            <form class="navbar-search d-flex me-3" action="{% url 'search' %}" method="get">
+                <input type="text" name="q" placeholder="Search books, authors..." value="{{ request.GET.q }}">
+                <button type="submit"><i class="fa fa-search"></i></button>
+            </form>
+            {% if user.is_authenticated %}
+            <div class="dropdown">
+                <a href="#" class="dropdown-toggle text-decoration-none d-flex align-items-center gap-2" data-bs-toggle="dropdown" style="color:rgba(255,255,255,0.82);padding:8px 10px;font-size:0.88rem;">
+                    <div style="width:30px;height:30px;background:var(--amber);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;">{{ user.first_name|first|upper }}{% if not user.first_name %}{{ user.username|first|upper }}{% endif %}</div>
+                    <span class="d-none d-lg-inline">{{ user.first_name|default:user.username }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" style="border:none;box-shadow:0 8px 30px rgba(0,0,0,0.15);border-radius:10px;padding:8px;">
+                    <li><a class="dropdown-item rounded-2" href="{% url 'profile' %}" style="font-size:0.88rem;padding:10px 16px;"><i class="fa fa-user me-2" style="color:var(--amber);"></i>My Profile</a></li>
+                    <li><a class="dropdown-item rounded-2" href="{% url 'profile' %}" style="font-size:0.88rem;padding:10px 16px;"><i class="fa fa-box me-2" style="color:var(--amber);"></i>My Orders</a></li>
+                    {% if user.is_staff %}<li><a class="dropdown-item rounded-2" href="/admin/" style="font-size:0.88rem;padding:10px 16px;"><i class="fa fa-cog me-2" style="color:var(--amber);"></i>Admin Panel</a></li>{% endif %}
+                    <li><hr class="dropdown-divider" style="margin:6px 12px;"></li>
+                    <li><a class="dropdown-item rounded-2" href="{% url 'logout' %}" style="font-size:0.88rem;padding:10px 16px;color:#b5451b;"><i class="fa fa-sign-out-alt me-2"></i>Sign Out</a></li>
+                </ul>
+            </div>
+            {% else %}
+            <div class="d-flex gap-2 ms-2">
+                <a href="{% url 'login' %}" class="btn btn-sm" style="color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.25);border-radius:4px;padding:7px 14px;font-size:0.82rem;font-weight:600;">Sign In</a>
+                <a href="{% url 'signup' %}" class="btn btn-amber btn-sm" style="font-size:0.82rem;padding:7px 14px;">Join Free</a>
+            </div>
+            {% endif %}
+            <a href="{% url 'cart' %}" class="position-relative text-decoration-none d-flex align-items-center" style="color:rgba(255,255,255,0.82);padding:8px 10px;font-size:1.1rem;">
+                <i class="fa fa-shopping-cart"></i>
+                {% if cart_count > 0 %}
+                <span class="cart-badge">{{ cart_count }}</span>
+                {% endif %}
+            </a>
+        </div>
+    </div>
+</nav>
+
+{% if user.is_staff %}
+<!-- ADMIN TOP BAR -->
+<div id="admin-bar" style="background:linear-gradient(90deg,#1a1208,#2d1f0e);border-bottom:2px solid var(--amber);padding:0;position:relative;z-index:999;">
+    <div class="container d-flex align-items-center justify-content-between" style="min-height:38px;gap:12px;flex-wrap:wrap;">
+        <div class="d-flex align-items-center gap-3">
+            <span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--amber);font-weight:700;">⚡ Admin Mode</span>
+            <span style="color:rgba(255,255,255,0.3);font-size:0.7rem;">|</span>
+            <span style="font-size:0.75rem;color:rgba(255,255,255,0.55);">Logged in as <strong style="color:var(--amber-light);">{{ user.username }}</strong></span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="/admin/" style="font-size:0.75rem;color:rgba(255,255,255,0.65);text-decoration:none;padding:5px 10px;border-radius:4px;transition:all 0.2s;" onmouseover="this.style.color='var(--amber-light)'" onmouseout="this.style.color='rgba(255,255,255,0.65)'"><i class="fa fa-th-large me-1"></i>Dashboard</a>
+            <a href="/admin/store/book/add/" style="font-size:0.75rem;color:rgba(255,255,255,0.65);text-decoration:none;padding:5px 10px;border-radius:4px;transition:all 0.2s;" onmouseover="this.style.color='var(--amber-light)'" onmouseout="this.style.color='rgba(255,255,255,0.65)'"><i class="fa fa-plus me-1"></i>Add Book</a>
+            <a href="/admin/store/category/add/" style="font-size:0.75rem;color:rgba(255,255,255,0.65);text-decoration:none;padding:5px 10px;border-radius:4px;transition:all 0.2s;" onmouseover="this.style.color='var(--amber-light)'" onmouseout="this.style.color='rgba(255,255,255,0.65)'"><i class="fa fa-folder-plus me-1"></i>Add Category</a>
+            <a href="/admin/store/subscriber/" style="font-size:0.75rem;color:rgba(255,255,255,0.65);text-decoration:none;padding:5px 10px;border-radius:4px;transition:all 0.2s;" onmouseover="this.style.color='var(--amber-light)'" onmouseout="this.style.color='rgba(255,255,255,0.65)'"><i class="fa fa-envelope me-1"></i>Subscribers</a>
+            <a href="/admin/store/order/" style="font-size:0.75rem;color:rgba(255,255,255,0.65);text-decoration:none;padding:5px 10px;border-radius:4px;transition:all 0.2s;" onmouseover="this.style.color='var(--amber-light)'" onmouseout="this.style.color='rgba(255,255,255,0.65)'"><i class="fa fa-box me-1"></i>Orders</a>
+        </div>
+    </div>
+</div>
+
+<!-- FLOATING ADMIN BUTTON -->
+<div style="position:fixed;bottom:28px;right:28px;z-index:9999;">
+    <div id="admin-fab-menu" style="display:none;flex-direction:column;gap:8px;margin-bottom:10px;align-items:flex-end;">
+        <a href="/admin/" style="display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;text-decoration:none;padding:10px 16px;border-radius:50px;font-size:0.82rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.3);white-space:nowrap;transition:all 0.2s;border:1px solid rgba(255,255,255,0.1);" onmouseover="this.style.background='#2d1f0e'" onmouseout="this.style.background='var(--ink)'">
+            <i class="fa fa-th-large" style="color:var(--amber);width:14px;"></i> Admin Dashboard
+        </a>
+        <a href="/admin/store/book/add/" style="display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;text-decoration:none;padding:10px 16px;border-radius:50px;font-size:0.82rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.3);white-space:nowrap;transition:all 0.2s;border:1px solid rgba(255,255,255,0.1);" onmouseover="this.style.background='#2d1f0e'" onmouseout="this.style.background='var(--ink)'">
+            <i class="fa fa-plus" style="color:#22c55e;width:14px;"></i> Add New Book
+        </a>
+        <a href="/admin/store/category/add/" style="display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;text-decoration:none;padding:10px 16px;border-radius:50px;font-size:0.82rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.3);white-space:nowrap;transition:all 0.2s;border:1px solid rgba(255,255,255,0.1);" onmouseover="this.style.background='#2d1f0e'" onmouseout="this.style.background='var(--ink)'">
+            <i class="fa fa-folder-plus" style="color:#3b82f6;width:14px;"></i> Add Category
+        </a>
+        <a href="/admin/store/book/" style="display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;text-decoration:none;padding:10px 16px;border-radius:50px;font-size:0.82rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.3);white-space:nowrap;transition:all 0.2s;border:1px solid rgba(255,255,255,0.1);" onmouseover="this.style.background='#2d1f0e'" onmouseout="this.style.background='var(--ink)'">
+            <i class="fa fa-book" style="color:var(--amber-light);width:14px;"></i> Manage Books
+        </a>
+        <a href="/admin/store/order/" style="display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;text-decoration:none;padding:10px 16px;border-radius:50px;font-size:0.82rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.3);white-space:nowrap;transition:all 0.2s;border:1px solid rgba(255,255,255,0.1);" onmouseover="this.style.background='#2d1f0e'" onmouseout="this.style.background='var(--ink)'">
+            <i class="fa fa-box" style="color:#a855f7;width:14px;"></i> View Orders
+        </a>
+        <a href="/admin/store/subscriber/" style="display:flex;align-items:center;gap:10px;background:var(--ink);color:#fff;text-decoration:none;padding:10px 16px;border-radius:50px;font-size:0.82rem;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.3);white-space:nowrap;transition:all 0.2s;border:1px solid rgba(255,255,255,0.1);" onmouseover="this.style.background='#2d1f0e'" onmouseout="this.style.background='var(--ink)'">
+            <i class="fa fa-envelope" style="color:#ef4444;width:14px;"></i> Subscribers
+        </a>
+    </div>
+    <button onclick="toggleAdminFab()" id="admin-fab-btn"
+        style="width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--amber-dark));border:none;color:#fff;font-size:1.2rem;cursor:pointer;box-shadow:0 6px 20px rgba(200,144,42,0.5);transition:all 0.3s;display:flex;align-items:center;justify-content:center;"
+        title="Admin Panel"
+        onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 8px 28px rgba(200,144,42,0.65)'"
+        onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 6px 20px rgba(200,144,42,0.5)'">
+        <i class="fa fa-cog" id="admin-fab-icon" style="transition:transform 0.4s;"></i>
+    </button>
+</div>
+<script>
+function toggleAdminFab() {
+    const menu = document.getElementById('admin-fab-menu');
+    const icon = document.getElementById('admin-fab-icon');
+    const open = menu.style.display === 'flex';
+    menu.style.display = open ? 'none' : 'flex';
+    icon.style.transform = open ? 'rotate(0deg)' : 'rotate(90deg)';
+}
+document.addEventListener('click', function(e) {
+    const fab = document.getElementById('admin-fab-btn');
+    const menu = document.getElementById('admin-fab-menu');
+    if (!fab.contains(e.target) && !menu.contains(e.target)) {
+        menu.style.display = 'none';
+        document.getElementById('admin-fab-icon').style.transform = 'rotate(0deg)';
+    }
+});
+</script>
+{% endif %}
+
+
+<!-- MESSAGES -->
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'warning' %}warning{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% block content %}{% endblock %}
+
+<!-- FOOTER -->
+<footer>
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="footer-brand mb-3">📚 BookVerse</div>
+                <p style="font-size:0.88rem;line-height:1.7;max-width:300px;">Your premier destination for books of every genre. Discover, explore, and lose yourself in the world of literature.</p>
+                <div class="mt-3 d-flex gap-3">
+                    <a href="#" style="display:inline;color:rgba(255,255,255,0.5);font-size:1.1rem;"><i class="fab fa-facebook"></i></a>
+                    <a href="#" style="display:inline;color:rgba(255,255,255,0.5);font-size:1.1rem;"><i class="fab fa-twitter"></i></a>
+                    <a href="#" style="display:inline;color:rgba(255,255,255,0.5);font-size:1.1rem;"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-6">
+                <h5>Browse</h5>
+                <a href="{% url 'book_list' %}">All Books</a>
+                <a href="{% url 'bestsellers' %}">Bestsellers</a>
+                <a href="{% url 'new_arrivals' %}">New Arrivals</a>
+                <a href="{% url 'audiobooks' %}">Audiobooks</a>
+            </div>
+            <div class="col-lg-2 col-6">
+                <h5>Info</h5>
+                <a href="#">About Us</a>
+                <a href="#">Contact</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+            <div class="col-lg-4">
+                <h5>Newsletter</h5>
+                <p style="font-size:0.85rem;">Subscribe for new arrivals, deals & reading recommendations.</p>
+                <div id="footer-subscribe-form" class="d-flex gap-2">
+                    <input type="email" id="footer-email" placeholder="Your email address" class="form-control form-control-sm" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);color:#fff;">
+                    <button onclick="footerSubscribe()" class="btn btn-amber btn-sm px-3" style="white-space:nowrap;">Subscribe</button>
+                </div>
+                <div id="subscribe-msg" class="mt-2" style="font-size:0.82rem;"></div>
+            </div>
+        </div>
+        <div class="footer-bottom text-center">
+            <p class="mb-0">© 2024 BookVerse. All rights reserved. Built with ❤️ using Django.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function footerSubscribe() {
+    const email = document.getElementById('footer-email').value;
+    if (!email) return;
+    fetch('/subscribe/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': getCookie('csrftoken')},
+        body: 'email=' + encodeURIComponent(email)
+    }).then(r => r.json()).then(d => {
+        document.getElementById('subscribe-msg').innerHTML = '<span style="color:' + (d.status==='success'?'#6fcf97':'#f2c94c') + '">' + d.message + '</span>';
+        if (d.status === 'success') document.getElementById('footer-email').value = '';
+    });
+}
+function getCookie(name) {
+    let c = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+    return c ? c[2] : '';
+}
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

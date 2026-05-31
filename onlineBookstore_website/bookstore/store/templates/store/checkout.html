@@ -1,0 +1,93 @@
+{% extends 'store/base.html' %}
+{% block title %}Checkout — BookVerse{% endblock %}
+{% block content %}
+<div class="page-hero" style="padding:32px 0;">
+    <div class="container"><h1 style="font-size:2rem;">💳 Checkout</h1></div>
+</div>
+<div class="container pb-5">
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div style="background:#fff;border-radius:12px;padding:32px;box-shadow:var(--card-shadow);">
+                <h4 style="font-family:'Playfair Display',serif;margin-bottom:24px;">Shipping Information</h4>
+                <form method="post" id="checkout-form">{% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-12"><input type="text" name="full_name" class="form-control" placeholder="Full Name *" required></div>
+                        <div class="col-md-6"><input type="email" name="email" class="form-control" placeholder="Email Address *" required></div>
+                        <div class="col-md-6"><input type="tel" name="phone" class="form-control" placeholder="Phone Number *" required></div>
+                        <div class="col-12"><textarea name="address" class="form-control" rows="2" placeholder="Street Address *" required></textarea></div>
+                        <div class="col-md-4"><input type="text" name="city" class="form-control" placeholder="City *" required></div>
+                        <div class="col-md-4"><input type="text" name="state" class="form-control" placeholder="State *" required></div>
+                        <div class="col-md-4"><input type="text" name="pincode" class="form-control" placeholder="Pincode *" required pattern="[0-9]{6}"></div>
+                    </div>
+
+                    <h5 style="font-family:'Playfair Display',serif;margin:28px 0 16px;">Payment Method</h5>
+                    <div class="row g-3">
+                        {% for val, label in "COD:Cash on Delivery,UPI:UPI Payment,CARD:Credit/Debit Card,NETBANK:Net Banking"|slice:":4" %}
+                        {% endfor %}
+                        <div class="col-6">
+                            <label style="border:2px solid #eee;border-radius:8px;padding:14px;cursor:pointer;display:block;transition:all 0.2s;" 
+                                   onclick="selectPayment(this,'COD')">
+                                <input type="radio" name="payment_method" value="COD" checked style="display:none;">
+                                <div class="text-center"><div style="font-size:1.5rem;">💵</div><div style="font-size:0.85rem;font-weight:600;margin-top:4px;">Cash on Delivery</div></div>
+                            </label>
+                        </div>
+                        <div class="col-6">
+                            <label style="border:2px solid #eee;border-radius:8px;padding:14px;cursor:pointer;display:block;transition:all 0.2s;" 
+                                   onclick="selectPayment(this,'UPI')">
+                                <input type="radio" name="payment_method" value="UPI" style="display:none;">
+                                <div class="text-center"><div style="font-size:1.5rem;">📱</div><div style="font-size:0.85rem;font-weight:600;margin-top:4px;">UPI Payment</div></div>
+                            </label>
+                        </div>
+                        <div class="col-6">
+                            <label style="border:2px solid #eee;border-radius:8px;padding:14px;cursor:pointer;display:block;transition:all 0.2s;" 
+                                   onclick="selectPayment(this,'CARD')">
+                                <input type="radio" name="payment_method" value="CARD" style="display:none;">
+                                <div class="text-center"><div style="font-size:1.5rem;">💳</div><div style="font-size:0.85rem;font-weight:600;margin-top:4px;">Credit/Debit Card</div></div>
+                            </label>
+                        </div>
+                        <div class="col-6">
+                            <label style="border:2px solid #eee;border-radius:8px;padding:14px;cursor:pointer;display:block;transition:all 0.2s;" 
+                                   onclick="selectPayment(this,'NETBANK')">
+                                <input type="radio" name="payment_method" value="NETBANK" style="display:none;">
+                                <div class="text-center"><div style="font-size:1.5rem;">🏦</div><div style="font-size:0.85rem;font-weight:600;margin-top:4px;">Net Banking</div></div>
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-amber w-100 mt-4 py-3" style="font-size:1rem;"><i class="fa fa-lock me-2"></i>Place Order Securely</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div style="background:#fff;border-radius:12px;padding:28px;box-shadow:var(--card-shadow);position:sticky;top:80px;">
+                <h4 style="font-family:'Playfair Display',serif;margin-bottom:20px;">Order Summary</h4>
+                {% for item in cart.items.all %}
+                <div class="d-flex gap-3 align-items-center mb-3 pb-3" style="border-bottom:1px solid #f0f0f0;">
+                    <div style="font-size:1.5rem;width:32px;text-align:center;">📚</div>
+                    <div style="flex:1;"><div style="font-size:0.88rem;font-weight:600;">{{ item.book.title|truncatechars:35 }}</div><div style="font-size:0.78rem;color:#999;">Qty: {{ item.quantity }}</div></div>
+                    <div style="font-weight:600;color:var(--amber-dark);">₹{{ item.subtotal }}</div>
+                </div>
+                {% endfor %}
+                <div class="d-flex justify-content-between mt-2"><span style="color:#666;">Subtotal</span><strong>₹{{ cart.total }}</strong></div>
+                <div class="d-flex justify-content-between"><span style="color:#666;">Shipping</span><span style="color:var(--sage);font-weight:600;">FREE</span></div>
+                <hr>
+                <div class="d-flex justify-content-between"><strong style="font-size:1.05rem;">Total</strong><strong style="font-size:1.3rem;color:var(--amber-dark);">₹{{ cart.total }}</strong></div>
+                <div class="mt-4 p-3" style="background:var(--cream);border-radius:8px;font-size:0.8rem;color:#666;">
+                    <i class="fa fa-shield-alt me-1 text-success"></i>Your information is safe and encrypted<br>
+                    <i class="fa fa-truck me-1 text-amber mt-1"></i>Estimated delivery: 3-7 business days
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function selectPayment(el, val) {
+    document.querySelectorAll('[onclick^="selectPayment"]').forEach(e => e.style.borderColor = '#eee');
+    el.style.borderColor = 'var(--amber)';
+    el.querySelector('input').checked = true;
+}
+document.querySelector('[onclick*="COD"]').style.borderColor = 'var(--amber)';
+</script>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'store/base.html' %}
+{% block title %}Shopping Cart — BookVerse{% endblock %}
+{% block content %}
+<div class="page-hero" style="padding:32px 0;">
+    <div class="container"><h1 style="font-size:2rem;">🛒 Your Cart</h1></div>
+</div>
+<div class="container pb-5">
+    {% if cart.items.all %}
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <form method="post" action="{% url 'update_cart' %}">{% csrf_token %}
+            {% for item in cart.items.all %}
+            <div style="background:#fff;border-radius:10px;padding:20px;margin-bottom:16px;box-shadow:var(--card-shadow);display:flex;gap:16px;align-items:center;" class="flex-wrap">
+                <div style="width:70px;flex-shrink:0;">
+                    {% if item.book.cover_image %}
+                    <img src="{{ item.book.cover_image.url }}" style="width:70px;height:98px;object-fit:cover;border-radius:6px;" alt="{{ item.book.title }}">
+                    {% else %}
+                    <div style="width:70px;height:98px;background:linear-gradient(160deg,#2d3a2d,#1a2818);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;">📚</div>
+                    {% endif %}
+                </div>
+                <div style="flex:1;min-width:150px;">
+                    <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--amber);font-weight:600;">{{ item.book.category.name }}</div>
+                    <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;">{{ item.book.title }}</div>
+                    <div style="font-size:0.85rem;color:#666;font-style:italic;">{{ item.book.author }}</div>
+                    <div style="font-size:0.9rem;font-weight:600;color:var(--amber-dark);margin-top:4px;">₹{{ item.book.price }} each</div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <input type="number" name="quantity_{{ item.pk }}" value="{{ item.quantity }}" min="0" max="20" style="width:70px;" class="form-control form-control-sm text-center">
+                </div>
+                <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;min-width:80px;text-align:right;">₹{{ item.subtotal }}</div>
+                <a href="{% url 'remove_from_cart' item.pk %}" style="color:var(--rust);font-size:0.9rem;" title="Remove"><i class="fa fa-trash"></i></a>
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-outline-amber btn-sm"><i class="fa fa-sync me-1"></i>Update Cart</button>
+            </form>
+        </div>
+
+        <div class="col-lg-4">
+            <div style="background:#fff;border-radius:12px;padding:28px;box-shadow:var(--card-shadow);position:sticky;top:80px;">
+                <h4 style="font-family:'Playfair Display',serif;margin-bottom:20px;">Order Summary</h4>
+                <div class="d-flex justify-content-between mb-2"><span style="color:#666;">Subtotal ({{ cart.item_count }} items)</span><strong>₹{{ cart.total }}</strong></div>
+                <div class="d-flex justify-content-between mb-2"><span style="color:#666;">Shipping</span><span style="color:var(--sage);font-weight:600;">FREE</span></div>
+                <div class="d-flex justify-content-between mb-2"><span style="color:#666;">Tax (18% GST)</span><strong>Included</strong></div>
+                <hr>
+                <div class="d-flex justify-content-between mb-4"><strong style="font-size:1.1rem;">Total</strong><strong style="font-size:1.3rem;color:var(--amber-dark);">₹{{ cart.total }}</strong></div>
+                <a href="{% url 'checkout' %}" class="btn btn-amber w-100 py-3" style="font-size:1rem;">Proceed to Checkout <i class="fa fa-arrow-right ms-2"></i></a>
+                <a href="{% url 'book_list' %}" class="btn btn-outline-amber w-100 mt-2">Continue Shopping</a>
+                <div class="text-center mt-4" style="font-size:0.78rem;color:#999;">
+                    <i class="fa fa-lock me-1"></i>Secure checkout · <i class="fa fa-truck me-1 ms-1"></i>Free shipping
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div style="font-size:5rem;margin-bottom:16px;">🛒</div>
+        <h3 style="font-family:'Playfair Display',serif;">Your cart is empty</h3>
+        <p class="text-muted mb-4">Discover amazing books and add them to your cart</p>
+        <a href="{% url 'book_list' %}" class="btn btn-amber px-5 py-3">Browse Books</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

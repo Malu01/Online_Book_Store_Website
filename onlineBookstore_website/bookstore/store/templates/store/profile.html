@@ -1,0 +1,168 @@
+{% extends 'store/base.html' %}
+{% block title %}My Account — BookVerse{% endblock %}
+{% block content %}
+<div class="page-hero" style="padding:32px 0;">
+    <div class="container">
+        <div class="d-flex align-items-center gap-4">
+            <div style="width:72px;height:72px;background:var(--amber);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;color:#fff;font-family:'Playfair Display',serif;font-weight:900;flex-shrink:0;">
+                {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+            </div>
+            <div>
+                <h1 style="font-size:1.8rem;margin-bottom:2px;">
+                    {% if user.first_name %}{{ user.first_name }} {{ user.last_name }}{% else %}{{ user.username }}{% endif %}
+                </h1>
+                <p style="color:rgba(255,255,255,0.6);margin:0;font-size:0.88rem;">@{{ user.username }} · Member since {{ user.date_joined|date:"M Y" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show mt-3" role="alert">
+        {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="row g-4 mt-2">
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <div style="background:#fff;border-radius:12px;padding:8px;box-shadow:var(--card-shadow);">
+                <a href="#profile" onclick="showTab('profile',this)" class="profile-tab active d-flex align-items-center gap-3 px-3 py-3 rounded-2 text-decoration-none" style="color:var(--ink);background:var(--cream);">
+                    <i class="fa fa-user" style="width:16px;color:var(--amber);"></i> <span style="font-size:0.9rem;font-weight:600;">My Profile</span>
+                </a>
+                <a href="#orders" onclick="showTab('orders',this)" class="profile-tab d-flex align-items-center gap-3 px-3 py-3 rounded-2 text-decoration-none" style="color:#666;">
+                    <i class="fa fa-box" style="width:16px;"></i> <span style="font-size:0.9rem;">My Orders</span>
+                    {% if orders %}<span class="ms-auto badge" style="background:var(--amber);color:#fff;font-size:0.7rem;">{{ orders.count }}</span>{% endif %}
+                </a>
+                <a href="#password" onclick="showTab('password',this)" class="profile-tab d-flex align-items-center gap-3 px-3 py-3 rounded-2 text-decoration-none" style="color:#666;">
+                    <i class="fa fa-lock" style="width:16px;"></i> <span style="font-size:0.9rem;">Change Password</span>
+                </a>
+                <hr style="margin:8px 12px;">
+                <a href="{% url 'logout' %}" class="d-flex align-items-center gap-3 px-3 py-3 rounded-2 text-decoration-none" style="color:var(--rust);">
+                    <i class="fa fa-sign-out-alt" style="width:16px;"></i> <span style="font-size:0.9rem;">Sign Out</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-lg-9">
+
+            <!-- PROFILE TAB -->
+            <div id="tab-profile">
+                <div style="background:#fff;border-radius:12px;padding:32px;box-shadow:var(--card-shadow);">
+                    <h4 style="font-family:'Playfair Display',serif;margin-bottom:24px;">Profile Information</h4>
+                    <form method="post" action="{% url 'profile' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_type" value="profile">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-600" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.5px;color:#555;">First Name</label>
+                                <input type="text" name="first_name" value="{{ user.first_name }}" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-600" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.5px;color:#555;">Last Name</label>
+                                <input type="text" name="last_name" value="{{ user.last_name }}" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-600" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.5px;color:#555;">Username</label>
+                                <input type="text" value="{{ user.username }}" class="form-control" readonly style="background:#f5f5f5;color:#999;">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-600" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.5px;color:#555;">Email</label>
+                                <input type="email" name="email" value="{{ user.email }}" class="form-control">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-amber mt-4 px-4">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ORDERS TAB -->
+            <div id="tab-orders" style="display:none;">
+                <div style="background:#fff;border-radius:12px;padding:32px;box-shadow:var(--card-shadow);">
+                    <h4 style="font-family:'Playfair Display',serif;margin-bottom:24px;">Order History</h4>
+                    {% if orders %}
+                    {% for order in orders %}
+                    <div style="border:1px solid #f0e8dc;border-radius:10px;padding:20px;margin-bottom:16px;">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                            <div>
+                                <div style="font-weight:700;font-family:'Playfair Display',serif;">#{{ order.order_number }}</div>
+                                <div style="font-size:0.82rem;color:#999;">{{ order.created_at|date:"d M Y, g:i A" }}</div>
+                            </div>
+                            <div class="text-end">
+                                <div style="font-size:1.1rem;font-weight:700;color:var(--amber-dark);">₹{{ order.total_amount }}</div>
+                                <span class="badge" style="background:{% if order.status == 'delivered' %}var(--sage){% elif order.status == 'shipped' %}#3b82f6{% elif order.status == 'cancelled' %}var(--rust){% else %}var(--amber){% endif %};color:#fff;font-size:0.72rem;">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mt-3" style="font-size:0.85rem;color:#666;">
+                            {% for item in order.items.all %}
+                            <div>📚 {{ item.book.title }} × {{ item.quantity }} — ₹{{ item.subtotal }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-2" style="font-size:0.8rem;color:#aaa;">
+                            <i class="fa fa-map-marker-alt me-1"></i>{{ order.city }}, {{ order.state }} · {{ order.payment_method }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center py-4">
+                        <div style="font-size:3rem;">📦</div>
+                        <h5 style="font-family:'Playfair Display',serif;margin-top:12px;">No orders yet</h5>
+                        <p class="text-muted mb-3">Your order history will appear here</p>
+                        <a href="{% url 'book_list' %}" class="btn btn-amber">Browse Books</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- PASSWORD TAB -->
+            <div id="tab-password" style="display:none;">
+                <div style="background:#fff;border-radius:12px;padding:32px;box-shadow:var(--card-shadow);">
+                    <h4 style="font-family:'Playfair Display',serif;margin-bottom:24px;">Change Password</h4>
+                    <form method="post" action="{% url 'profile' %}" style="max-width:400px;">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_type" value="password">
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.5px;color:#555;font-weight:600;">Current Password</label>
+                            <input type="password" name="current_password" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.5px;color:#555;font-weight:600;">New Password</label>
+                            <input type="password" name="new_password1" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="font-size:0.82rem;text-transform:uppercase;letter-spacing:0.5px;color:#555;font-weight:600;">Confirm New Password</label>
+                            <input type="password" name="new_password2" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-amber px-4">Update Password</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showTab(name, el) {
+    document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
+    document.getElementById('tab-' + name).style.display = 'block';
+    document.querySelectorAll('.profile-tab').forEach(t => {
+        t.style.background = 'transparent';
+        t.style.color = '#666';
+        t.querySelector('i').style.color = '#aaa';
+    });
+    el.style.background = 'var(--cream)';
+    el.style.color = 'var(--ink)';
+    el.querySelector('i').style.color = 'var(--amber)';
+    return false;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'store/base.html' %}
+{% block title %}{{ category.name }} Books — BookVerse{% endblock %}
+{% block content %}
+<div class="page-hero">
+    <div class="container">
+        <div style="font-size:3rem;margin-bottom:8px;">{{ category.icon }}</div>
+        <h1>{{ category.name }}</h1>
+        {% if category.description %}<p style="color:rgba(255,255,255,0.7);">{{ category.description }}</p>{% endif %}
+        <p style="color:rgba(255,255,255,0.5);margin:0;">{{ books.count }} books</p>
+    </div>
+</div>
+<div class="container pb-5">
+    {% if books %}
+    <div class="row g-3">
+        {% for book in books %}
+        <div class="col-6 col-md-4 col-lg-3">{% include 'store/partials/book_card.html' %}</div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5"><div style="font-size:4rem;">📚</div><h3>No books in this category yet</h3><a href="/admin/store/book/add/" class="btn btn-amber mt-3">Add via Admin</a></div>
+    {% endif %}
+</div>
+{% endblock %}
